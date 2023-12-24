@@ -2,20 +2,13 @@
 
 import React from 'react';
 
+import ExplorerAccount from '@/components/ExplorerAccount';
 import ExplorerHeader from '@/components/ExplorerHeader';
+import ExtrinsicsTable from '@/components/ExtrinsicsTable';
 import TransfersTable from '@/components/TransfersTable';
-import { Card, CardBody,   Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Button,
- } from '@nextui-org/react';
-  import {Tabs, Tab} from "@nextui-org/react";
+import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
 
 import { columns, users } from '../../../data/extrinsics';
-import { ChevronDown,  } from 'lucide-react';
-import ExtrinsicsTable from '@/components/ExtrinsicsTable';
-import ExplorerAccount from '@/components/ExplorerAccount';
 
 const data = {
   name: '_batman',
@@ -32,21 +25,21 @@ function page() {
         <p className="text-lg w-80">Accounts: 0xb28ed3..... 014a0f29 </p>
         <ExplorerHeader />
       </div>
-     <ExplorerAccount data={data} />
+      <ExplorerAccount data={data} />
 
       <Card className="mt-4">
         <CardBody>
-        <Tabs aria-label="Options" variant="underlined" color='primary'>
-        <Tab key="photos" title="Extrinsics(6)">
-            <ExtrinsicsTable users={users} columns={columns} />
-        </Tab>
-        <Tab key="music" title="Transfers">
-        <TransfersTable users={users} columns={columns} />
-        </Tab>
-        <Tab key="videos" title="WASM Transactions">
-            <TransfersTable users={users} columns={columns} />
-        </Tab>
-      </Tabs>
+          <Tabs aria-label="Options" variant="underlined" color="primary">
+            <Tab key="photos" title="Extrinsics(6)">
+              <TransfersTable users={users} columns={columns} />
+            </Tab>
+            <Tab key="music" title="Transfers">
+              <TransfersTable users={users} columns={columns} />
+            </Tab>
+            <Tab key="videos" title="WASM Transactions">
+              <TransfersTable users={users} columns={columns} />
+            </Tab>
+          </Tabs>
           {/* <TransfersTable users={users} columns={columns} /> */}
         </CardBody>
       </Card>

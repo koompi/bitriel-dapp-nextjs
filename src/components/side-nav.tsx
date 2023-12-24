@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { SIDENAV_ITEMS } from '@/constants';
 import { SideNavItem } from '@/types';
-import { Icon } from '@iconify/react';
+
+// import { Icon } from '@iconify/react';
 
 const SideNav = () => {
   return (
@@ -17,7 +19,8 @@ const SideNav = () => {
           href="/"
           className="flex flex-row space-x-3 items-center justify-center md:justify-start md:px-6 border-b border-zinc-200 h-16 w-full"
         >
-          <img src="/bitriel-logo-dark.png" className="h-7 w-auto " />
+          {/* <img src="/bitriel-logo.png" className="h-7 w-auto " /> */}
+          <Image src="/bitriel-logo.png" height={52} width={150} alt="logo" />
         </Link>
 
         <div className="flex flex-col md:px-4 space-y-[44vh] h-auto">

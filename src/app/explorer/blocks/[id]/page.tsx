@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import ExplorerHeader from '@/components/ExplorerHeader';
 import { Card, CardBody } from '@nextui-org/react';
+import { Copy } from 'lucide-react';
 
 export default function page() {
   return (
@@ -72,7 +73,7 @@ export default function page() {
                     <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                       0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a0f29
                       <span>
-                        <img src="/copy.png" className="w-4 h-4" />
+                        <Copy size="16px" color="gray" />
                       </span>
                     </td>
                   </tr>
@@ -116,7 +117,7 @@ export default function page() {
                           0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd40
                         </span>
                         <span>
-                          <img src="/copy.png" className="w-4 h-4" />
+                          <Copy size="16px" color="gray" />
                         </span>
                       </Link>
                     </td>
