@@ -6,6 +6,7 @@ import Link from 'next/link';
 
 import ExplorerHeader from '@/components/ExplorerHeader';
 import { Card, CardBody } from '@nextui-org/react';
+import { Copy } from 'lucide-react';
 
 export default function page() {
   return (
@@ -53,7 +54,8 @@ export default function page() {
                     <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                       0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a0f29
                       <span>
-                        <img src="/copy.png" className="w-4 h-4" />
+                        {/* <img src="/copy.png" className="w-4 h-4" /> */}
+                        <Copy size="16px" color="gray" />
                       </span>
                     </td>
                   </tr>
@@ -75,7 +77,7 @@ export default function page() {
                     <td className="text-sm  font-light px-6 py-4 whitespace-nowrap">
                       <Link
                         href="#"
-                        className="px-3 py-2 text-white bg-sel_blue rounded-3xl"
+                        className="px-3 py-2 text-white bg-primary rounded-3xl"
                       >
                         set
                       </Link>
@@ -89,12 +91,13 @@ export default function page() {
                       <div>
                         <span>
                           From
-                          <span className="text-sel_blue ">0xkiew534o4s</span>{' '}
+                          <span className="text-sel_blue ml-2">
+                            0xkiew534o4s
+                          </span>{' '}
                         </span>
-                        <span className=" ml-8">
-                        
+                        <span className=" ml-4">
                           To
-                          <span className="text-sel_blue">
+                          <span className="text-sel_blue ml-2">
                             PromoT....idator
                           </span>
                         </span>
@@ -107,7 +110,7 @@ export default function page() {
                     </td>
                     <td className="  text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
                       <Link href="#" className="flex items-center gap-2">
-                       0.000023535 SEL
+                        0.000023535 SEL
                       </Link>
                     </td>
                   </tr>
@@ -124,7 +127,7 @@ export default function page() {
                       Signer Public key
                     </td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                    0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a
+                      0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a
                     </td>
                   </tr>
                   <tr className="bg-white ">
@@ -147,8 +150,8 @@ export default function page() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Result
                     </td>
-                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                    <td className="text-sm text-gray-900 font-light py-4 whitespace-nowrap">
+                      <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 whitespace-nowrap">
                         <span>
                           <img src="/check.png" className="w-4 h-4" />
                         </span>

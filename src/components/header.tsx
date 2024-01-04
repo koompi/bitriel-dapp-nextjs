@@ -2,13 +2,30 @@
 
 import React from 'react';
 
-import Link from 'next/link';
+import Image from 'next/image';
 import { useSelectedLayoutSegment } from 'next/navigation';
 
 import useScroll from '@/hooks/use-scroll';
 import { cn } from '@/lib/utils';
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from '@nextui-org/react';
+import { ChevronDown, Moon, Search } from 'lucide-react';
 
 const Header = () => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const scrolled = useScroll(5);
   const selectedLayout = useSelectedLayoutSegment();
 
@@ -23,69 +40,134 @@ const Header = () => {
       )}
     >
       <div className="flex h-[47px] items-center justify-between px-4">
-        {/* <div className="flex items-center space-x-4">
-          <Link
-            href="/"
-            className="flex flex-row space-x-3 items-center justify-center md:hidden"
-          >
-            <span className="h-7 w-7 bg-zinc-300 rounded-lg" />
-            <span className="font-bold text-xl flex ">Logo</span>
-          </Link>
-        </div> */}
-
-        <div className="border bg-white bg-opacity-0 flex items-stretch gap-2 pl-4 pr-20 py-1 rounded-[10px] border-solid border-zinc-300 w-80 max-md:max-w-full max-md:flex-wrap max-md:pr-5">
-          <img
-            loading="lazy"
-            srcSet="/nav-search.png"
-            className="aspect-square object-contain object-center w-5 overflow-hidden shrink-0 max-w-full"
-          />
-          <input
-            className="bg-transparent appearance-none border-none text-md w-full py-1 text-gray-500 leading-tight focus:outline-none focus:shadow-outline"
-            id="username"
-            type="text"
-            style={{ border: 'none !important' }}
-            placeholder="Search"
-          />
-        </div>
-
+        <Input
+          type="email"
+          className="w-[300px]"
+          placeholder="Search"
+          labelPlacement="outside"
+          variant="bordered"
+          startContent={
+            <Search className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+          }
+        />
         <div className="flex items-stretch justify-between gap-5 max-md:flex-wrap max-md:justify-center">
-          <div className="border bg-white bg-opacity-0 flex items-stretch gap-2 px-2 py-2 rounded-xl border-solid border-zinc-300 max-md:max-w-full max-md:flex-wrap max-md:pr-5">
-            <img
-              loading="lazy"
-              src="/dark-mode.png"
-              className="aspect-square object-contain object-center w-[20px] overflow-hidden shrink-0 max-w-full cursor-pointer "
-            />
-          </div>
-
-          <div className="border bg-white bg-opacity-0 flex items-stretch gap-2 pl-4 pr-4 py-1 rounded-xl border-solid border-zinc-300 max-md:max-w-full max-md:flex-wrap max-md:pr-5 cursor-pointer">
-            <div className="flex items-stretch justify-between gap-px">
-              <img
-                loading="lazy"
-                srcSet="/sel-logo-blue.png"
-                className="aspect-[0.67] object-contain object-center w-4 overflow-hidden shrink-0 max-w-full"
-              />
-              <div className="text-neutral-500 text-md ml-2 font-medium self-center grow whitespace-nowrap my-auto">
+          <Button isIconOnly color="primary" variant="faded" aria-label="Moon">
+            <Moon />
+          </Button>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button
+                variant="bordered"
+                endContent={<ChevronDown />}
+                startContent={
+                  <Image
+                    src="/sel-logo-blue.png"
+                    alt="sel"
+                    width={12}
+                    height={22}
+                  />
+                }
+              >
                 Selendra
-              </div>
-            </div>
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu variant="faded" aria-label="Dropdown menu with icons">
+              <DropdownItem
+                key="new"
+                startContent={
+                  <Image src="/ethereum.png" alt="sel" width={12} height={22} />
+                }
+              >
+                Ethereum
+              </DropdownItem>
+              <DropdownItem
+                key="copy"
+                startContent={
+                  <Image src="/polkadot.png" alt="sel" width={12} height={22} />
+                }
+              >
+                Polkadot
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
 
-            <img
-              loading="lazy"
-              srcSet="/arrow-down.png"
-              className="aspect-square object-contain object-center w-3.5 overflow-hidden shrink-0 max-w-full mt-2 self-start"
-            />
-          </div>
-
-          <div className="text-white text-md font-medium shadow-sm bg-secondary grow justify-center items-stretch px-4 py-2 rounded-xl w-fit cursor-pointer">
+          <Button color="secondary" onClick={onOpen}>
             Connect Wallet
-          </div>
+          </Button>
         </div>
 
-        {/* <div className="hidden md:block">
-          <div className="h-8 w-8 rounded-full bg-zinc-300 flex items-center justify-center text-center">
-            <span className="font-semibold text-sm">HQ</span>
-          </div>
-        </div> */}
+        <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+          <ModalContent>
+            {() => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  <p className="text-2xl font-semibold">Connect Wallet</p>
+                  <p>Choose a method to connect</p>
+                </ModalHeader>
+                <ModalBody>
+                  <div className="flex gap-2 bg-slate-200 rounded-lg p-4">
+                    <Image
+                      src="/google-logo.png"
+                      width={52}
+                      height={52}
+                      alt="google"
+                    />
+                    <div>
+                      <p className="font-semibold">Connect with Google</p>
+                      <p>Wallet linked to your google account.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 bg-slate-200 rounded-lg p-4">
+                    <Image
+                      src="/bitriel-logo-no-text.png"
+                      width={52}
+                      height={52}
+                      // style={{ width: 'auto', height: '20px' }}
+                      alt="metamask"
+                    />
+                    <div>
+                      <p className="font-semibold">Bitriel Wallet</p>
+                      <p>Using a browser extension.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 bg-slate-200 rounded-lg p-4">
+                    <Image
+                      src="/metamask.png"
+                      width={52}
+                      height={52}
+                      alt="metamask"
+                    />
+                    <div>
+                      <p className="font-semibold">Metamask Wallet</p>
+                      <p>Using a browser extension.</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 bg-slate-200 rounded-lg p-4">
+                    <Image
+                      src="/walletconnect.png"
+                      width={52}
+                      height={22}
+                      alt="metamask"
+                    />
+                    <div>
+                      <p className="font-semibold">WalletConnect</p>
+                      <p>Using a browser extension.</p>
+                    </div>
+                  </div>
+                </ModalBody>
+                <ModalFooter>
+                  <p>
+                    By connecting a wallet, you acknowledge that you have read
+                    and understand the Bitriel Protocol Disclaimer.{' '}
+                    <span className="text-sel_blue">
+                      Read the privacy policy.
+                    </span>
+                  </p>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
       </div>
     </div>
   );

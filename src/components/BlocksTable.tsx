@@ -51,20 +51,20 @@ export default function BlocksTable({ users, columns }: BlocksTableProps) {
     const cellValue = user[columnKey as keyof User];
 
     switch (columnKey) {
-      case 'name':
-        return (
-          <Link href="#" className="text-sel_blue">
-            <User
-              avatarProps={{ radius: 'md', src: '/block.png' }}
-              description={
-                <p>
-                  Include <span className="text-blue-500">{user.email}</span>
-                </p>
-              }
-              name={cellValue}
-            />
-          </Link>
-        );
+      // case 'name':
+      //   return (
+      //     <Link href="#" className="text-sel_blue">
+      //       <User
+      //         avatarProps={{ radius: 'md', src: '/block.png' }}
+      //         description={
+      //           <p>
+      //             Include <span className="text-blue-500">{user.email}</span>
+      //           </p>
+      //         }
+      //         name={cellValue}
+      //       />
+      //     </Link>
+      //   );
 
       case 'actions':
         return (

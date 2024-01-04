@@ -111,20 +111,11 @@ export default function ExtrinsicsTable({ users, columns }: BlocksTableProps) {
       aria-label="Example table with custom cells"
       className="pt-0"
       removeWrapper
-      bottomContent={<div>Pagination</div>}
-      // bottomContent={
-      //   <div className="flex w-full justify-end">
-      //     <Pagination
-      //       isCompact
-      //       showControls
-      //       showShadow
-      //       color="secondary"
-      //       page={page}
-      //       total={pages}
-      //       onChange={(page) => setPage(page)}
-      //     />
-      //   </div>
-      // }
+      bottomContent={
+        <div className="flex justify-end">
+          <Pagination total={10} color="primary" size="sm" />
+        </div>
+      }
     >
       <TableHeader columns={columns}>
         {(column) => (
@@ -142,7 +133,9 @@ export default function ExtrinsicsTable({ users, columns }: BlocksTableProps) {
           <TableRow key={item.id} className=" border-b">
             {(columnKey) => (
               <TableCell className="text-sel_blue">
-                <Link href="/explorer/extrinsics/1">{renderCell(item, columnKey)}</Link>
+                <Link href="/explorer/extrinsics/1">
+                  {renderCell(item, columnKey)}
+                </Link>
               </TableCell>
             )}
           </TableRow>
