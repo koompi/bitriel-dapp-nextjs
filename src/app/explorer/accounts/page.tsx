@@ -27,7 +27,7 @@ function page() {
     },
   ];
   return (
-    <div className="px-40 mt-6">
+    <div className="px-40 md:px-4 mt-6">
       <div className="flex items-center justify-between mb-6">
         <p className="text-2xl">Accounts</p>
         <ExplorerHeader />

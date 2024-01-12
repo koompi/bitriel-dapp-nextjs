@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
+import { usePathname } from 'next/navigation';
+
+import { EXPLORERNAV_ITEMS, SIDENAV_ITEMS } from '@/constants';
 import {
-  Avatar,
   Button,
   Dropdown,
   DropdownItem,
@@ -13,7 +15,7 @@ import {
   NavbarContent,
   NavbarItem,
 } from '@nextui-org/react';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown, Menu, Search } from 'lucide-react';
 
 const explorer_nav_items = [
   {
@@ -54,13 +56,38 @@ function ExplorerNav() {
     <section>
       <div className="bg-image h-64 w-full flex items-center flex-col">
         <Navbar
-          className="bg-transparent w-full px-40 mx-0 flex justify-end"
+          className="bg-transparent w-full px-4 md:px-40 mx-0 flex justify-end"
           isBlurred={false}
           classNames={{
             wrapper: ' px-0',
           }}
         >
           <div></div>
+          <NavbarContent className="flex sm:hidden " justify="center">
+            <NavbarItem>
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Link className="text-white border rounded-md p-1" href="#">
+                    <Menu size="20px" />
+                  </Link>
+                </DropdownTrigger>
+                <DropdownMenu
+                  variant="faded"
+                  aria-label="Dropdown menu with icons"
+                >
+                  <DropdownItem isReadOnly key="new" className="flex flex-col">
+                    {' '}
+                    <div className="flex flex-col space-y-2  md:px-6 ">
+                      {EXPLORERNAV_ITEMS.map((item, idx) => {
+                        return <MenuItem key={idx} item={item} />;
+                      })}
+                    </div>
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </NavbarItem>
+          </NavbarContent>
+
           <NavbarContent className="hidden sm:flex " justify="center">
             <NavbarItem>
               <Link className="text-white" href="#">
@@ -101,7 +128,8 @@ function ExplorerNav() {
             ))}
           </NavbarContent>
         </Navbar>
-        <h1 className="text-white text-4xl font-bold mt-4">
+
+        <h1 className="text-white text-3xl text-center md:text-4xl font-bold mt-4">
           Selendra Blockchain Explorer
         </h1>
 
@@ -111,7 +139,7 @@ function ExplorerNav() {
           labelPlacement="outside"
           size="lg"
           radius="md"
-          className="mt-8 px-80"
+          className="mt-8 px-6 md:px-40 lg:px-80"
           classNames={{
             input: [''],
             // innerWrapper: ["px-0"],
@@ -165,3 +193,61 @@ function ExplorerNav() {
 }
 
 export default ExplorerNav;
+
+const MenuItem = ({ item }: { item: SideNavItem }) => {
+  const pathname = usePathname();
+  const [subMenuOpen, setSubMenuOpen] = useState(false);
+  const toggleSubMenu = () => {
+    setSubMenuOpen(!subMenuOpen);
+  };
+
+  return (
+    <div className="">
+      {item.submenu ? (
+        <>
+          <button
+            onClick={toggleSubMenu}
+            className={`flex flex-row items-center p-2 rounded-lg hover-bg-zinc-100 w-full justify-between hover:bg-zinc-100 ${
+              pathname.includes(item.path) ? 'bg-zinc-100' : ''
+            }`}
+          >
+            <div className="flex flex-row space-x-4 items-center">
+              <span className="font-semibold text-xl  flex">{item.title}</span>
+            </div>
+
+            <div className={`${subMenuOpen ? 'rotate-180' : ''} flex`}>
+              <ChevronDown />
+            </div>
+          </button>
+
+          {subMenuOpen && (
+            <div className="my-2 ml-12 flex flex-col space-y-4">
+              {item.subMenuItems?.map((subItem, idx) => {
+                return (
+                  <Link
+                    key={idx}
+                    href={subItem.path}
+                    className={`${
+                      subItem.path === pathname ? 'font-bold' : ''
+                    }`}
+                  >
+                    <span>{subItem.title}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </>
+      ) : (
+        <Link
+          href={item.path}
+          className={`flex flex-row space-x-4 items-center p-2 rounded-lg hover:bg-zinc-100 ${
+            item.path === pathname ? 'bg-zinc-100' : ''
+          }`}
+        >
+          <span className="font-semibold text-xl flex">{item.title}</span>
+        </Link>
+      )}
+    </div>
+  );
+};

@@ -2,10 +2,10 @@
 
 import React from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 import {
-  ChipProps,
   Pagination,
   Table,
   TableBody,
@@ -17,24 +17,18 @@ import {
 } from '@nextui-org/react';
 import { CheckCircle2 } from 'lucide-react';
 
+import timeAgo from '../lib/ConvertTime';
+
 // import { columns, users } from './data';
 
 type User = {
+  eventsCount: number;
   id: string;
-  name: string;
-  email: string;
+  timestamp: string;
+  extrinsicsCount: number;
+  height: number;
+  hash: string;
   validator: string;
-  status: boolean;
-  age: string;
-  events: string;
-  blockhash: string;
-  extrinsics: string;
-};
-
-const statusColorMap: Record<string, ChipProps['color']> = {
-  active: 'success',
-  paused: 'danger',
-  vacation: 'warning',
 };
 
 // type User = (typeof users)[0];
@@ -51,25 +45,10 @@ export default function BlocksTable({ users, columns }: BlocksTableProps) {
     const cellValue = user[columnKey as keyof User];
 
     switch (columnKey) {
-      // case 'name':
-      //   return (
-      //     <Link href="#" className="text-sel_blue">
-      //       <User
-      //         avatarProps={{ radius: 'md', src: '/block.png' }}
-      //         description={
-      //           <p>
-      //             Include <span className="text-blue-500">{user.email}</span>
-      //           </p>
-      //         }
-      //         name={cellValue}
-      //       />
-      //     </Link>
-      //   );
-
       case 'actions':
         return (
           <div className="relative flex items-center justify-end gap-2">
-            <p>5 secs ago</p>
+            <p>{timeAgo(user.timestamp)}</p>
 
             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
               <CheckCircle2 color="green" size="16px" />
@@ -99,26 +78,38 @@ export default function BlocksTable({ users, columns }: BlocksTableProps) {
       case 'age':
         return (
           <div className="relative flex items-center justify-start gap-2">
-            <p>{user.age} secs ago </p>
+            <p>{timeAgo(user.timestamp)} </p>
+          </div>
+        );
+      case 'name':
+        return (
+          <div className="relative flex items-center justify-start gap-2">
+            <p>{user.height} </p>
           </div>
         );
       case 'extrinsics':
         return (
           <div className="relative flex items-center justify-start gap-2 text-sel_blue">
-            <Link href="#">{user.extrinsics}</Link>
+            <Link href="#">{user.extrinsicsCount}</Link>
           </div>
         );
       case 'events':
         return (
           <div className="relative flex items-center justify-start gap-2 text-sel_blue">
-            <p>{user.events}</p>
+            <p>{user.eventsCount}</p>
           </div>
         );
       case 'validators':
         return (
           <Link href="#">
             <div className="relative flex flex-row items-center justify-start gap-2 text-sel_blue">
-              <img src="/profile.png" className="w-6 h-6" />
+              <Image
+                src="/profile.png"
+                alt="validator-pf"
+                width={500}
+                height={500}
+                className="w-6 h-6"
+              />
               <p>{user.validator}</p>
             </div>
           </Link>
@@ -129,7 +120,7 @@ export default function BlocksTable({ users, columns }: BlocksTableProps) {
             href="#"
             className="relative flex items-center justify-start gap-2 text-sel_blue"
           >
-            <p>{user.blockhash}</p>
+            <p>{user.hash}</p>
           </Link>
         );
       default:

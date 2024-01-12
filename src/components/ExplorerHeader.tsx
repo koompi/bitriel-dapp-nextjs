@@ -1,17 +1,17 @@
 import React from 'react';
+
 import {
   Button,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-
   Link,
   Navbar,
   NavbarContent,
   NavbarItem,
 } from '@nextui-org/react';
-import { ChevronDown, } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import './style.css';
 
@@ -33,7 +33,7 @@ const explorer_nav_items = [
     name: 'EVM',
     dropdown: [
       { item: 'Transactions', link: '/explorer/evm/transactions' },
-      { item: 'Contracts',  link: '/explorer/evm/contracts' },
+      { item: 'Contracts', link: '/explorer/evm/contracts' },
       { item: 'ERC-20 Tokens', link: '/explorer/evm/erc20' },
       { item: 'ERC-721 Tokens', link: '/explorer/evm/erc721' },
     ],
@@ -53,7 +53,8 @@ const explorer_nav_items = [
 function ExplorerHeader() {
   return (
     <>
-      <Navbar
+      <p>sg</p>
+      {/* <Navbar
         className="bg-transparent w-full px-0 mx-0 flex justify-end "
         isBlurred={false}
         classNames={{
@@ -100,7 +101,7 @@ function ExplorerHeader() {
             </NavbarItem>
           ))}
         </NavbarContent>
-      </Navbar>
+      </Navbar> */}
     </>
   );
 }

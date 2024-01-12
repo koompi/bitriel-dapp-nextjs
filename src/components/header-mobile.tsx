@@ -8,7 +8,18 @@ import { usePathname } from 'next/navigation';
 import { SIDENAV_ITEMS } from '@/constants';
 import { SideNavItem } from '@/types';
 import { Icon } from '@iconify/react';
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+} from '@nextui-org/react';
 import { motion, useCycle } from 'framer-motion';
+import { Moon, Search } from 'lucide-react';
+
+import Header from './header';
 
 type MenuItemWithSubMenuProps = {
   item: SideNavItem;
@@ -54,30 +65,27 @@ const HeaderMobile = () => {
         className="absolute inset-0 right-0 w-full bg-white"
         variants={sidebar}
       />
+
       <motion.ul
         variants={variants}
-        className="absolute grid w-full gap-3 px-10 py-16"
+        className="absolute grid w-full gap-3 px-10 py-16 "
       >
         {SIDENAV_ITEMS.map((item, idx) => {
           const isLastItem = idx === SIDENAV_ITEMS.length - 1; // Check if it's the last item
 
           return (
             <div key={idx}>
-              {item.submenu ? (
-                <MenuItemWithSubMenu item={item} toggleOpen={toggleOpen} />
-              ) : (
-                <MenuItem>
-                  <Link
-                    href={item.path}
-                    onClick={() => toggleOpen()}
-                    className={`flex w-full text-2xl ${
-                      item.path === pathname ? 'font-bold' : ''
-                    }`}
-                  >
-                    {item.title}
-                  </Link>
-                </MenuItem>
-              )}
+              <MenuItem>
+                <Link
+                  href={item.path}
+                  onClick={() => toggleOpen()}
+                  className={`flex w-full text-2xl  ${
+                    item.path === pathname ? 'font-bold' : ''
+                  }`}
+                >
+                  {item.title}
+                </Link>
+              </MenuItem>
 
               {!isLastItem && (
                 <MenuItem className="my-3 h-px w-full bg-gray-300" />
@@ -96,7 +104,7 @@ export default HeaderMobile;
 const MenuToggle = ({ toggle }: { toggle: any }) => (
   <button
     onClick={toggle}
-    className="pointer-events-auto absolute right-4 top-[14px] z-30"
+    className="pointer-events-auto absolute right-4 top-[16px] z-30"
   >
     <svg width="23" height="23" viewBox="0 0 23 23">
       <Path
@@ -144,57 +152,6 @@ const MenuItem = ({
     <motion.li variants={MenuItemVariants} className={className}>
       {children}
     </motion.li>
-  );
-};
-
-const MenuItemWithSubMenu: React.FC<MenuItemWithSubMenuProps> = ({
-  item,
-  toggleOpen,
-}) => {
-  const pathname = usePathname();
-  const [subMenuOpen, setSubMenuOpen] = useState(false);
-
-  return (
-    <>
-      <MenuItem>
-        <button
-          className="flex w-full text-2xl"
-          onClick={() => setSubMenuOpen(!subMenuOpen)}
-        >
-          <div className="flex flex-row justify-between w-full items-center">
-            <span
-              className={`${pathname.includes(item.path) ? 'font-bold' : ''}`}
-            >
-              {item.title}
-            </span>
-            <div className={`${subMenuOpen && 'rotate-180'}`}>
-              <Icon icon="lucide:chevron-down" width="24" height="24" />
-            </div>
-          </div>
-        </button>
-      </MenuItem>
-      <div className="mt-2 ml-2 flex flex-col space-y-2">
-        {subMenuOpen && (
-          <>
-            {item.subMenuItems?.map((subItem, subIdx) => {
-              return (
-                <MenuItem key={subIdx}>
-                  <Link
-                    href={subItem.path}
-                    onClick={() => toggleOpen()}
-                    className={` ${
-                      subItem.path === pathname ? 'font-bold' : ''
-                    }`}
-                  >
-                    {subItem.title}
-                  </Link>
-                </MenuItem>
-              );
-            })}
-          </>
-        )}
-      </div>
-    </>
   );
 };
 

@@ -2,156 +2,206 @@
 
 import * as React from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import ExplorerHeader from '@/components/ExplorerHeader';
+import { gql, useQuery } from '@apollo/client';
 import { Card, CardBody } from '@nextui-org/react';
 import { Copy } from 'lucide-react';
 
-export default function page() {
+const BLOCK_BY_ID = gql`
+  query BlockByID($id: String!) {
+    blockById(id: $id) {
+      id
+      validator
+      hash
+      specVersion
+      timestamp
+      height
+      parentHash
+      extrinsicsCount
+      eventsCount
+      callsCount
+    }
+  }
+`;
+
+/**
+ * Interface for the props passed to the BlockPage component.
+ * Contains the route params with the block ID.
+ */
+interface BlockPageProps {
+  params: {
+    id: string;
+  };
+}
+
+const BlockPage: React.FC<BlockPageProps> = () => {
+  const params = useParams();
+  console.log('params', params.id);
+
+  const { loading, error, data } = useQuery(BLOCK_BY_ID, {
+    // variables: { id: params.id },
+    variables: { id: params.id },
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) {
+    console.error('GraphQL error:', error);
+    return <p>Error: {error.message}</p>;
+  }
+  console.log('block-by-id', data.blockById);
+
   return (
-    <div className=" px-40">
+    <div className="px-4 sm:px-20 lg:px-40">
       <div className="flex items-center justify-between my-6">
         <p className="text-2xl w-80">
-          Blocks <span className="text-gray-400">#358952502</span>
+          Blocks{' '}
+          <span className="text-gray-400"># {data.blockById.height}</span>
         </p>
         <ExplorerHeader />
       </div>
       <Card>
         <CardBody>
           <div className="py-2 inline-block min-w-full sm:px-6 lg:px-8">
-            <div className="overflow-hidden">
-              <table className="min-w-full">
-                {/* <thead className="border-b">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
-                    >
-                      #
-                    </th>
-                    <th
-                      scope="col"
-                      className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
-                    >
-                      First
-                    </th>
-                  </tr>
-                </thead> */}
-                <tbody>
-                  <tr className="border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Timestamp
-                    </td>
-                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      2023-11-20 07:40:42 (+UTC)
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Block Time
-                    </td>
-                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      12 min ago
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Status
-                    </td>
-                    <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+            <table className="min-w-full">
+              <tbody>
+                <tr className="border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Timestamp
+                  </td>
+                  <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                    {data.blockById.timestamp}
+                  </td>
+                </tr>
+                <tr className="bg-white border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Block Time
+                  </td>
+                  <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                    {convertTimeToSecond(data.blockById.timestamp)} seconds ago
+                  </td>
+                </tr>
+                <tr className="bg-white border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Status
+                  </td>
+                  <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                    <span>
+                      <Image
+                        src="/check.png"
+                        alt="check-img"
+                        width={500}
+                        height={500}
+                        className="w-4 h-4"
+                      />
+                    </span>
+                    Finalized
+                  </td>
+                </tr>
+
+                <tr className="bg-white border-b">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    Hash
+                  </td>
+                  <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4">
+                    {data.blockById.hash}
+                    <span>
+                      <Copy
+                        size="16px"
+                        color="gray"
+                        className="cursor-pointer"
+                        onClick={() =>
+                          navigator.clipboard.writeText(data.blockById.hash)
+                        }
+                      />
+                    </span>
+                  </td>
+                </tr>
+                <tr className="bg-white border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Parent Hash
+                  </td>
+                  <td className="text-sm text-sel_blue font-light px-6 py-4 whitespace-normal">
+                    <Link href="#" className="whitespace-normal">
+                      {data.blockById.parentHash}
+                    </Link>
+                  </td>
+                </tr>
+                <tr className="bg-white border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Extrinsics Count
+                  </td>
+                  <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                    {data.blockById.extrinsicsCount}
+                  </td>
+                </tr>
+
+                <tr className="bg-white border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Event Count
+                  </td>
+                  <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                    {data.blockById.eventsCount}
+                  </td>
+                </tr>
+
+                <tr className="bg-white border-b">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Validator
+                  </td>
+                  <td className="  text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
+                    <Link href="#" className="flex items-center gap-2">
                       <span>
-                        <img src="/check.png" className="w-4 h-4" />
+                        <Image
+                          src="/profile.png"
+                          alt="profile"
+                          width={500}
+                          height={500}
+                          className="w-6 h-6"
+                        />
                       </span>
-                      Finalized
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Hash
-                    </td>
-                    <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a0f29
+                      <span>{data.blockById.validator}</span>
                       <span>
-                        <Copy size="16px" color="gray" />
+                        <Copy
+                          size="16px"
+                          color="gray"
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              data.blockById.validator,
+                            )
+                          }
+                        />
                       </span>
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Parent Hash
-                    </td>
-                    <td className="text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
-                      <Link href="#">
-                        {' '}
-                        0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a
-                      </Link>
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Extrinsics
-                    </td>
-                    <td className="text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
-                      <Link href="#">23252</Link>
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Extrinsics Count
-                    </td>
-                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      23
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Validator
-                    </td>
-                    <td className="  text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
-                      <Link href="#" className="flex items-center gap-2">
-                        <span>
-                          <img src="/profile.png" className="w-6 h-6" />
-                        </span>
-                        <span>
-                          0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd40
-                        </span>
-                        <span>
-                          <Copy size="16px" color="gray" />
-                        </span>
-                      </Link>
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Events
-                    </td>
-                    <td className="text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
-                      <Link href="#">2525</Link>
-                    </td>
-                  </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Event Count
-                    </td>
-                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      2
-                    </td>
-                  </tr>
-                  <tr className="bg-white ">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Specs Version
-                    </td>
-                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      71
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                    </Link>
+                  </td>
+                </tr>
+
+                <tr className="bg-white ">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    Specs Version
+                  </td>
+                  <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                    {data.blockById.specVersion}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </CardBody>
       </Card>
     </div>
   );
+};
+
+export default BlockPage;
+
+function convertTimeToSecond(timestamp: string) {
+  const date: Date = new Date(timestamp);
+  const now: Date = new Date();
+  const timeDifference: number = now.getTime() - date.getTime();
+  const secondsAgo: number = Math.floor(timeDifference / 1000);
+  return secondsAgo;
 }
