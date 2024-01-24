@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,7 +8,6 @@ import Link from 'next/link';
 import truncateMiddle from '@/lib/TruncateMiddle';
 import {
   Pagination,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -19,11 +18,8 @@ import {
 } from '@nextui-org/react';
 import { CheckCircle2 } from 'lucide-react';
 
-import timeAgo from '../lib/ConvertTime';
-
-// import PaginationControls from './PaginationControls';
-
-// import { columns, users } from './data';
+import timeAgo from '@/lib/ConvertTime';
+import PaginationControls from '../PaginationControls';
 
 type User = {
   eventsCount: number;
@@ -37,24 +33,22 @@ type User = {
 
 interface BlocksTableProps {
   users: User[];
-  columns: { uid: string; name: string }[];
-  loading: boolean;
+  columns: { uid: string; name: string }[]; 
+  
 }
 
-export default function BlocksTable({
+export default function ERC20TokensTable({
   users,
-  columns,
-  loading,
+  columns, 
 }: BlocksTableProps) {
   {
-    users?.map((x, i) => {
-      console.log('timess', timeAgo(x.timestamp));
+    users.map((x, i) => {
       return <p key={i}>{timeAgo(x.timestamp)}</p>;
     });
   }
 
   const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
-    // console.log('timess', timeAgo(user.timestamp));
+    console.log('timess', timeAgo(user.timestamp));
     const cellValue = user[columnKey as keyof User];
 
     switch (columnKey) {
@@ -98,19 +92,20 @@ export default function BlocksTable({
         return (
           <div className="relative flex text-sel_blue items-center justify-start gap-2">
             <Link href={`/explorer/blocks/${user.id}`}>
+              {' '}
               <p>{user.height} </p>
             </Link>
           </div>
         );
       case 'extrinsics':
         return (
-          <div className="relative flex items-center justify-start gap-2 ">
+          <div className="relative flex items-center justify-start gap-2 text-sel_blue">
             <Link href="#">{user.extrinsicsCount}</Link>
           </div>
         );
       case 'events':
         return (
-          <div className="relative flex items-center justify-start gap-2">
+          <div className="relative flex items-center justify-start gap-2 text-sel_blue">
             <p>{user.eventsCount}</p>
           </div>
         );
@@ -132,7 +127,7 @@ export default function BlocksTable({
       case 'blockhash':
         return (
           <Link
-            href={`/explorer/blocks/${user.id}`}
+            href="#"
             className="relative flex items-center justify-start gap-2 text-sel_blue"
           >
             <p>{truncateMiddle(user.hash, 52)}</p>
@@ -143,8 +138,29 @@ export default function BlocksTable({
     }
   }, []);
 
+  const itemsPerPage = 20;
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const currentData = users.slice(start, end);
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
   return (
     <div>
+      <div>
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+      </div>
+
       <Table
         aria-label="Example table with custom cells"
         className="pt-0"
@@ -166,14 +182,9 @@ export default function BlocksTable({
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody
-          items={users}
-          isLoading={!loading}
-          loadingContent={<Spinner label="Loading..." />}
-          className="border-b-2"
-        >
+        <TableBody items={currentData} className="border-b-2">
           {(item) => (
-            <TableRow key={item.id} className="border-b">
+            <TableRow key={item.id} className=" border-b">
               {(columnKey) => {
                 return <TableCell>{renderCell(item, columnKey)}</TableCell>;
               }}

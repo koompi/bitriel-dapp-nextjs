@@ -1,27 +1,20 @@
 // import { EvmContractsItem } from '@/types';
 
 const columns = [
-  // {name: "Extrinsic ID", uid: "eid"},
-  { name: 'Block', uid: 'name' },
-  { name: 'Status', uid: 'blocksstatus' },
-  { name: 'Age', uid: 'age' },
-  { name: 'Extrinsics', uid: 'extrinsics' },
-  { name: 'Events', uid: 'events' },
-  { name: 'Validators', uid: 'validators' },
-  { name: 'Block Hash', uid: 'blockhash' },
+  // { name: 'ID', uid: 'id' },
+  { name: 'Contract', uid: 'contract' },
+  { name: 'Name', uid: 'name' },
+  { name: 'Extrinsic Hash', uid: 'extrinsichash' },
+  { name: 'Verified Time', uid: 'verified_time' },
 ];
 
 const users = [
   {
-    id: 1,
     contract: 'lslsl',
     name: '99259350',
-    evm_version: 3,
-    transaction: 3,
-    balance: 3233,
-    verified_time: 'ii35',
+    extrinsichash: '349pgj;grh',
+    verified_time: 'ijlg',
   },
-  
 ];
 
 export { columns, users };

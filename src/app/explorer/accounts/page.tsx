@@ -2,59 +2,74 @@
 
 import React from 'react';
 
-import Image from 'next/image';
-
+import AccountsTable from '@/components/AccountsTable';
 import ExplorerHeader from '@/components/ExplorerHeader';
-import TransfersTable from '@/components/TransfersTable';
+import { gql, useQuery } from '@apollo/client';
 import { Card, CardBody } from '@nextui-org/react';
 import { User, Users } from 'lucide-react';
 
-import { columns, users } from '../../data/accounts';
+import { columns } from '../../data/accounts';
 
-function page() {
-  const accounts = [
-    {
-      id: 1,
-      title: 'Holders',
-      value: '543254',
-      img: <Users color="#F1B951" size="36px" />,
-    },
-    {
-      id: 2,
-      title: 'Acive Holders',
-      value: '5254',
-      img: <User color="#F1B951" size="36px" />,
-    },
-  ];
+const GET_ACCOUNTS = gql`
+  query Accounts {
+    accounts {
+      evmAddress
+      freeBalance
+      id
+      totalBalance
+      updatedAt
+      reservedBalance
+    }
+  }
+`;
+
+function Accounts() {
+  const { loading, error, data } = useQuery(GET_ACCOUNTS);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
+  const accounts = data.accounts;
+  console.log('accounts', accounts.length);
+
   return (
-    <div className="px-40 md:px-4 mt-6">
+    <div className="px-40 mt-6">
       <div className="flex items-center justify-between mb-6">
         <p className="text-2xl">Accounts</p>
         <ExplorerHeader />
       </div>
       <div className="flex flex-row gap-3">
-        {accounts.map((account) => (
-          <Card className="w-full p-4" key={account.id}>
-            <CardBody className="flex flex-row gap-3">
-              {/* <Image width={52} height={52} alt='account-img' src={account.img} /> */}
-              <div className="w-16 h-16 bg-primary bg-opacity-20 rounded-full flex justify-center items-center">
-                {account.img}
-              </div>
-              <div className="flex flex-col">
-                <p className="text-sm">{account.title}</p>
-                <p className="text-2xl text-default-500">{account.value}</p>
-              </div>
-            </CardBody>
-          </Card>
-        ))}
+        <Card className="w-full p-4">
+          <CardBody className="flex flex-row gap-3">
+            {/* <Image width={52} height={52} alt='account-img' src={account.img} /> */}
+            <div className="w-16 h-16 bg-primary bg-opacity-20 rounded-full flex justify-center items-center">
+              <Users color="#F1B951" size="36px" />
+            </div>
+            <div className="flex flex-col">
+              <p className="text-sm">Holder</p>
+              <p className="text-2xl text-default-500">{accounts.length - 1}</p>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="w-full p-4">
+          <CardBody className="flex flex-row gap-3">
+            {/* <Image width={52} height={52} alt='account-img' src={account.img} /> */}
+            <div className="w-16 h-16 bg-primary bg-opacity-20 rounded-full flex justify-center items-center">
+              <User color="#F1B951" size="36px" />
+            </div>
+            <div className="flex flex-col">
+              <p className="text-sm">Active Holder</p>
+              <p className="text-2xl text-default-500">-</p>
+            </div>
+          </CardBody>
+        </Card>
       </div>
       <Card className="mt-4">
         <CardBody>
-          <TransfersTable users={users} columns={columns} />
+          <AccountsTable users={accounts} columns={columns} />
         </CardBody>
       </Card>
     </div>
   );
 }
 
-export default page;
+export default Accounts;

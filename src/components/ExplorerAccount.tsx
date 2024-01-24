@@ -3,7 +3,10 @@
 import React from 'react';
 
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 
+import ConvertBigNumber from '@/lib/ConvertBigNumber';
+import { gql, useQuery } from '@apollo/client';
 import {
   Button,
   Card,
@@ -12,6 +15,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Tooltip,
 } from '@nextui-org/react';
 import {
   ChevronDown,
@@ -22,35 +26,59 @@ import {
   Wallet,
 } from 'lucide-react';
 
-interface MyComponentProps {
-  data: {
-    name: string;
-    addr: string;
-    totalbalance: number;
-    freebalance: number;
-    reservedbalance: number;
-  };
-}
+const ACCOUNT_BY_ID = gql`
+  query AccountByID($id: String!) {
+    accountById(id: $id) {
+      id
+      evmAddress
+      freeBalance
+      reservedBalance
+      totalBalance
+      updatedAt
+    }
+  }
+`;
 
-function ExplorerAccount({ data }: MyComponentProps): React.ReactElement {
+function ExplorerAccount({}): React.ReactElement {
+  const params = useParams();
+  const { loading, error, data } = useQuery(ACCOUNT_BY_ID, {
+    variables: { id: params.id },
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
+  console.log('batman', data);
+  const item = data.accountById;
   return (
     <div className="flex flex-row gap-3">
       <Card className="w-full p-4">
         <CardBody className="flex flex-col gap-3">
           <div className="flex flex-row items-center gap-2">
             <Image width={52} height={52} alt="profile" src="/profile.png" />
-            <p className="text-2xl">{data.name}</p>
+            <p className="text-2xl">{item.name ? item.name : 'Unknown'}</p>
           </div>
           <div className="flex flex-row items-center gap-2">
             <p className="text-md overflow-hidden">
               <span className="font-semibold mr-2 text-xl">Address:</span>
-              {data.addr}
+              {item.evmAddress}
             </p>
-            <Copy size="16px" color="gray" />
+            <Copy
+              size="16px"
+              color="gray"
+              className="cursor-pointer"
+              onClick={() => navigator.clipboard.writeText(item.evmAddress)}
+            />
           </div>
-          <div className="flex flex-row gap-3">
+          <div className="flex flex-row gap-3 mt-2">
             <div className="bg-primary bg-opacity-20 p-2 flex justify-center items-center rounded-full">
-              <QrCode className="-2" color="#F1B951" size="16px" />
+              <Tooltip content="QR Code">
+                <QrCode
+                  className="-2"
+                  color="#F1B951"
+                  size="16px"
+                  onClick={() => navigator.clipboard.writeText('')}
+                />
+              </Tooltip>
             </div>
             <div className="bg-primary bg-opacity-20 p-2 flex justify-center items-center rounded-full">
               <Fingerprint className="-2" color="#F1B951" size="16px" />
@@ -58,9 +86,6 @@ function ExplorerAccount({ data }: MyComponentProps): React.ReactElement {
             <div className="bg-primary bg-opacity-20 p-2 flex justify-center items-center rounded-full">
               <Key className="-2" color="#F1B951" size="16px" />
             </div>
-            {/* <img src="/account-qr.png" className="w-6 h-6" />
-            <img src="/account-id.png" className="w-6 h-6" />
-            <img src="/account-key.png" className="w-6 h-6" /> */}
           </div>
         </CardBody>
       </Card>
@@ -70,15 +95,21 @@ function ExplorerAccount({ data }: MyComponentProps): React.ReactElement {
           <div className="flex flex-row justify-between">
             <div className="flex flex-col ">
               <p className="text-gray-400"> Total Balance</p>
-              <p className="text-lg">{data.totalbalance} SEL</p>
+              <p className="text-lg">
+                {ConvertBigNumber(item.totalBalance)} SEL
+              </p>
             </div>
             <div className="flex flex-col ">
               <p className="text-gray-400">Free Balance</p>
-              <p className="text-lg">{data.freebalance} SEL</p>
+              <p className="text-lg">
+                {ConvertBigNumber(item.freeBalance)} SEL
+              </p>
             </div>
             <div className="flex flex-col ">
               <p className="text-gray-400">Reserved Balance</p>
-              <p className="text-lg">{data.reservedbalance} SEL</p>
+              <p className="text-lg">
+                {ConvertBigNumber(item.reservedBalance)} SEL
+              </p>
             </div>
           </div>
           <div className="mt-6">
@@ -87,7 +118,7 @@ function ExplorerAccount({ data }: MyComponentProps): React.ReactElement {
               <Dropdown placement="bottom-start">
                 <DropdownTrigger>
                   <Button className="capitalize pl-6  bg-transparent border-2 w-full flex justify-between">
-                    30 ETH
+                    {ConvertBigNumber(item.totalBalance)} SEL
                     <ChevronDown />
                   </Button>
                 </DropdownTrigger>
@@ -99,11 +130,22 @@ function ExplorerAccount({ data }: MyComponentProps): React.ReactElement {
                   // selectedKeys={selectedKeys}
                   // onSelectionChange={setSelectedKeys}
                 >
-                  <DropdownItem key="text">Addresses</DropdownItem>
-                  <DropdownItem key="number">Tokens</DropdownItem>
-                  <DropdownItem key="date">Name Tags</DropdownItem>
-                  <DropdownItem key="single_date">Label</DropdownItem>
-                  <DropdownItem key="iteration">Website</DropdownItem>
+                  <DropdownItem
+                    key="copy"
+                    startContent={
+                      <Image
+                        src="/sel-logo-blue.png"
+                        alt="sel"
+                        width={12}
+                        height={22}
+                      />
+                    }
+                    endContent={
+                      <p> {ConvertBigNumber(item.totalBalance)} SEL</p>
+                    }
+                  >
+                    Selendra
+                  </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
               {/* <img src='/wallet.png' className="h-10 w-auto"/> */}

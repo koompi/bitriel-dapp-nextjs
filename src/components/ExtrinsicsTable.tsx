@@ -4,11 +4,9 @@ import React from 'react';
 
 import Link from 'next/link';
 
+import timeAgo from '@/lib/ConvertTime';
+import truncateMiddle from '@/lib/TruncateMiddle';
 import {
-  Avatar,
-  Chip,
-  ChipProps,
-  getKeyValue,
   Pagination,
   Table,
   TableBody,
@@ -16,33 +14,21 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  Tooltip,
   User,
 } from '@nextui-org/react';
-import { ArrowRight, CheckCircle2, Columns } from 'lucide-react';
-
-// import { columns, users } from './data';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 type User = {
+  timestamp: string;
   id: string;
-  name: string;
-  email: string;
-  validator: string;
-  status: boolean;
-  age: string;
-  events: string;
-  blockhash: string;
-  from: string;
-  extrinsics: string;
+  extrinsicHash: string;
+  fee: number;
+  success: boolean;
+  block: {
+    height: number;
+    id: string;
+  };
 };
-
-const statusColorMap: Record<string, ChipProps['color']> = {
-  active: 'success',
-  paused: 'danger',
-  vacation: 'warning',
-};
-
-// type User = (typeof users)[0];
 
 interface BlocksTableProps {
   users: User[];
@@ -50,16 +36,16 @@ interface BlocksTableProps {
 }
 
 export default function ExtrinsicsTable({ users, columns }: BlocksTableProps) {
-  console.log(users);
+  console.log('extrin', users);
 
   const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
     const cellValue = user[columnKey as keyof User];
 
     switch (columnKey) {
-      case 'from':
+      case '':
         return (
           <div className="relative flex items-center justify-between py-2 gap-2">
-            <p>{user.from}</p>
+            <p>{}</p>
 
             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
               <ArrowRight color="green" size="16px" />
@@ -76,35 +62,43 @@ export default function ExtrinsicsTable({ users, columns }: BlocksTableProps) {
           </div>
         );
 
-      case 'age':
+      case 'time':
         return (
           <div className="relative flex items-center justify-start gap-2">
-            <p>{user.age} secs ago </p>
+            <p>{timeAgo(user.timestamp)} </p>
           </div>
         );
-      case 'extrinsics':
+      case 'name':
         return (
           <div className="relative flex items-center justify-start gap-2 text-sel_blue">
-            <Link href="#">{user.extrinsics}</Link>
+            <Link href={`/explorer/blocks/${user.block.id}`}>
+              <p>{user.block.height} </p>
+            </Link>
+          </div>
+        );
+      case 'extrinsichash':
+        return (
+          <div className="relative flex items-center justify-start gap-2">
+            <p>{truncateMiddle(user.extrinsicHash, 50)} </p>
+          </div>
+        );
+      case 'fee':
+        return (
+          <div className="relative flex items-center justify-start gap-2">
+            <p>{user.fee ? user.fee : '-'} </p>
+          </div>
+        );
+      case 'eid':
+        return (
+          <div className="relative flex items-center justify-start gap-2 text-sel_blue">
+            <Link href={`/explorer/extrinsics/${user.id}`}>{user.id}</Link>
           </div>
         );
 
       default:
-        return cellValue;
+        return <>{cellValue}</>;
     }
   }, []);
-
-  // const [page, setPage] = React.useState(1);
-  // const rowsPerPage = 4;
-
-  // const pages = Math.ceil(users.length / rowsPerPage);
-
-  // const items = React.useMemo(() => {
-  //   const start = (page - 1) * rowsPerPage;
-  //   const end = start + rowsPerPage;
-
-  //   return users.slice(start, end);
-  // }, [page, users]);
 
   return (
     <Table
@@ -132,7 +126,7 @@ export default function ExtrinsicsTable({ users, columns }: BlocksTableProps) {
         {(item) => (
           <TableRow key={item.id} className=" border-b">
             {(columnKey) => (
-              <TableCell className="text-sel_blue">
+              <TableCell>
                 <Link href="/explorer/extrinsics/1">
                   {renderCell(item, columnKey)}
                 </Link>

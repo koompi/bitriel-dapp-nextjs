@@ -11,16 +11,16 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     top: true,
   },
   {
+    title: 'Wallet',
+    path: '/wallet',
+    icon: <Icon icon="lucide:wallet" width="24" height="24" />,
+    top: true,
+  },
+  {
     title: 'Explorer',
     path: '/explorer',
     icon: <Icon icon="lucide:compass" width="24" height="24" />,
 
-    top: true,
-  },
-  {
-    title: 'Wallet',
-    path: '/wallet',
-    icon: <Icon icon="lucide:wallet" width="24" height="24" />,
     top: true,
   },
   {

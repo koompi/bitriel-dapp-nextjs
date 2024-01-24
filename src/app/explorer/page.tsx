@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 
 import ExplorerNav from '@/components/ExplorerNav';
+import timeAgo from '@/lib/ConvertTime';
 // import { data1 } from '@/constants';
 import {
   Card,
@@ -28,6 +29,8 @@ import './styles.css';
 
 import Link from 'next/link';
 
+import ConvertBigNumber from '@/lib/ConvertBigNumber';
+import truncateMiddle from '@/lib/TruncateMiddle';
 import { gql, useQuery } from '@apollo/client';
 
 const GET_LATEST_BLOCKS = gql`
@@ -189,7 +192,7 @@ const LatestBlocks: React.FC<LatestBlocksProps> = ({ setTotalBlock }) => {
                     </TableCell>
                     <TableCell>
                       <div className="relative flex items-center justify-end gap-2">
-                        <p>{time(x.timestamp)} secs ago</p>
+                        <p>{timeAgo(x.timestamp)}</p>
 
                         <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
                           <CheckCircle2 color="green" size="16px" />
@@ -285,9 +288,7 @@ const LatestTrasactions: React.FC<LatestTokenTransferProps> = ({
                     <TableCell>
                       <div className="relative flex flex-col items-end justify-end gap-2">
                         <p className="text-md">
-                          {divideAndEnsureDecimal(
-                            x.amount / 1000000000000000000000,
-                          )}
+                          {ConvertBigNumber(x.amount)}
                           SEL
                         </p>
                         <p>{timeAgo(x.timestamp)}</p>
@@ -303,43 +304,3 @@ const LatestTrasactions: React.FC<LatestTokenTransferProps> = ({
     </Card>
   );
 };
-
-
-function divideAndEnsureDecimal(scientificNumber: number): number {
-  const decimalNumber: number = parseFloat(scientificNumber.toPrecision(15));
-  return decimalNumber;
-}
-
-function time(timestamp: string) {
-  const date: Date = new Date(timestamp);
-  const now: Date = new Date();
-  const timeDifference: number = now.getTime() - date.getTime();
-  const secondsAgo: number = Math.floor(timeDifference / 1000);
-  return secondsAgo;
-}
-
-function timeAgo(timestamp: string): string {
-  const date: Date = new Date(timestamp);
-  const now: Date = new Date();
-  const timeDifference: number = now.getTime() - date.getTime();
-  const daysAgo: number = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-
-  if (daysAgo === 0) {
-    return 'Today';
-  } else if (daysAgo === 1) {
-    return 'Yesterday';
-  } else {
-    return `${daysAgo} days ago`;
-  }
-}
-
-function truncateMiddle(str: string, length: number): string {
-  if (str.length <= length) {
-    return str;
-  }
-  const mid: number = Math.floor(str.length / 2);
-  const start: number = mid - Math.floor(length / 2);
-  const end: number = start + length;
-  const truncatedString: string = str.slice(0, start) + '....' + str.slice(end);
-  return truncatedString;
-}

@@ -10,15 +10,7 @@ import MarginWidthWrapper from '@/components/margin-width-wrapper';
 import PageWrapper from '@/components/page-wrapper';
 import SideNav from '@/components/side-nav';
 
-// import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
-
-// import client from './graphql/apollo-client';
 import { Providers } from './providers';
-
-// const client = new ApolloClient({
-//   uri: 'http://localhost:4350/graphql',
-//   cache: new InMemoryCache(),
-// });
 
 const inter = Inter({ subsets: ['latin'] });
 

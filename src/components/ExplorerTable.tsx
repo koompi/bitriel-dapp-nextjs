@@ -2,9 +2,10 @@
 
 import React from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
-import { EvmContractsItem } from '@/types';
+import truncateMiddle from '@/lib/TruncateMiddle';
 import {
   Pagination,
   Table,
@@ -15,169 +16,103 @@ import {
   TableRow,
   User,
 } from '@nextui-org/react';
-import { CheckCircle2 } from 'lucide-react';
 
-// import { columns, users } from './data';
-
-// type User = {
-//   id: number;
-//   name: string;
-//   email: string;
-//   validator: string;
-//   status: boolean;
-//   age: string;
-//   events: string;
-//   blockhash: string;
-//   extrinsics: string;
-//   account: string
-//   eid: number,
-//   balance:string,
-//   reward: string
-// };
-
-// type User = (typeof users)[0];
-
+type User = {
+  id: string;
+  contract: string;
+  name: string;
+  extrinsicHash: string;
+  verified_time: string;
+  account: string;
+};
 interface BlocksTableProps {
-  users: EvmContractsItem[];
-  columns: { uid: string; name: string }[]; // Add columns prop
+  users: User[];
+  columns: { uid: string; name: string }[];
 }
 
-export default function ExplorerTable({ users, columns }: BlocksTableProps) {
+export default function ExplorerTable({ users, type, columns }: BlocksTableProps) {
   const renderCell = React.useCallback(
-    (user: EvmContractsItem, columnKey: React.Key) => {
-      const cellValue = user[columnKey as keyof EvmContractsItem];
+    (user: User, columnKey: React.Key) => {
+      console.log('usersss', users);
+      const cellValue = user[columnKey as keyof User];
 
       switch (columnKey) {
+        case 'contract':
+          return (
+            <div className="relative flex items-center flex-row text-sel_blue  gap-2">
+              <Link href={`/explorer/evm/contracts/${user.id}`}>
+                <Image
+                  src="/smart-contracts.png"
+                  alt="smart-contract"
+                  width={20}
+                  height={20}
+                  className="w-4 h-auto"
+                />
+                <p>{truncateMiddle(user.account, 20)}</p>
+              </Link>
+            </div>
+          );
+
         case 'name':
           return (
-            <Link href="#" className="text-sel_blue">
-              <User
-                avatarProps={{ radius: 'md', src: '/block.png' }}
-                description={
-                  <p>
-                    Include <span className="text-blue-500">{user.email}</span>
-                  </p>
-                }
-                name={cellValue}
-              />
-            </Link>
-          );
-
-        case 'actions':
-          return (
-            <div className="relative flex items-center justify-end gap-2">
-              <p>5 secs ago</p>
-
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <CheckCircle2 color="green" size="16px" />
-              </span>
+            <div className="relative flex items-center  gap-2">
+              <p>Unknown</p>
             </div>
           );
 
-        case 'status':
-          return (
-            <div className="relative flex items-center justify-end gap-2">
-              <p>5 secs ago</p>
-
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <CheckCircle2 color="green" size="16px" />
-              </span>
-            </div>
-          );
-        case 'blocksstatus':
+        case 'verified_time':
           return (
             <div className="relative flex items-center justify-start gap-2">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <CheckCircle2 color="green" size="16px" />
-              </span>
+              <p>Unknown </p>
+            </div>
+          );
+        case 'extrinsichash':
+          return (
+            <div className="relative flex items-center justify-start gap-2">
+              <p>{truncateMiddle(user.extrinsicHash, 30)} </p>
             </div>
           );
 
-        case 'age':
-          return (
-            <div className="relative flex items-center justify-start gap-2">
-              <p>{user.age} secs ago </p>
-            </div>
-          );
-        case 'extrinsics':
-          return (
-            <div className="relative flex items-center justify-start gap-2 text-sel_blue">
-              <Link href="#">{user.extrinsics}</Link>
-            </div>
-          );
-        case 'events':
-          return (
-            <div className="relative flex items-center justify-start gap-2 text-sel_blue">
-              <p>{user.events}</p>
-            </div>
-          );
-        case 'validators':
-          return (
-            <Link href="#">
-              <div className="relative flex flex-row items-center justify-start gap-2 text-sel_blue">
-                <img src="/profile.png" className="w-6 h-6" />
-                <p>{user.validator}</p>
-              </div>
-            </Link>
-          );
-        case 'blockhash':
-          return (
-            <Link
-              href="#"
-              className="relative flex items-center justify-start gap-2 text-sel_blue"
-            >
-              <p>{user.blockhash}</p>
-            </Link>
-          );
         default:
           return cellValue;
       }
     },
-    [],
+    [users],
   );
 
-  // const rowsPerPage = 4;
-
-  // const pages = Math.ceil(users.length / rowsPerPage);
-
-  // const items = React.useMemo(() => {
-  //   const start = (page - 1) * rowsPerPage;
-  //   const end = start + rowsPerPage;
-
-  //   return users.slice(start, end);
-  // }, [page, users]);
-
   return (
-    <Table
-      aria-label="Example table with custom cells"
-      className="pt-0"
-      removeWrapper
-      bottomContent={
-        <div className="flex justify-end">
-          <Pagination total={10} color="primary" size="sm" />
-        </div>
-      }
-    >
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === 'actions' ? 'end' : 'start'}
-            className="text-md"
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody items={users} className="border-b-2">
-        {(item) => (
-          <TableRow key={item.id} className=" border-b">
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div>
+      <Table
+        aria-label="Example table with custom cells"
+        className="pt-0"
+        removeWrapper
+        bottomContent={
+          <div className="flex justify-end">
+            <Pagination total={10} color="primary" size="sm" />
+          </div>
+        }
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === 'actions' ? 'end' : 'start'}
+              className="text-md"
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={users} className="border-b-2">
+          {(item) => (
+            <TableRow key={item.id} className=" border-b">
+              {(columnKey) => {
+                return <TableCell>{renderCell(item, columnKey)}</TableCell>;
+              }}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
   );
 }

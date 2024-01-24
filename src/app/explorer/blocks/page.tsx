@@ -1,17 +1,20 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+
+import { useSearchParams } from 'next/navigation';
 
 import BlocksTable from '@/components/BlocksTable';
 import ExplorerHeader from '@/components/ExplorerHeader';
+import PaginationControls from '@/components/PaginationControls';
 import { gql, useQuery } from '@apollo/client';
 import { Card, CardBody } from '@nextui-org/react';
 
 import { columns } from '../../data/blocks';
 
 const GET_LATEST_BLOCKS = gql`
-  query GetLatestBlocks {
-    blocks(limit: 10, orderBy: timestamp_DESC) {
+  query GetLatestBlocks($limit: Int, $offset: Int) {
+    blocks(limit: $limit, offset: $offset, orderBy: timestamp_DESC) {
       eventsCount
       id
       timestamp
@@ -23,18 +26,53 @@ const GET_LATEST_BLOCKS = gql`
   }
 `;
 
-function Page() {
-  const { loading, error, data, refetch } = useQuery(GET_LATEST_BLOCKS);
+function Blocks() {
+  const PAGE_SiZE = useSearchParams().get('page') ?? '1';
+  console.log('page sixe', PAGE_SiZE);
+
+  const [currentPage, setCurrentPage] = useState(parseInt(PAGE_SiZE));
+  const [blocks, setBLocks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { data, refetch } = useQuery(GET_LATEST_BLOCKS, {
+    variables: {
+      limit: 20,
+      offset: parseInt(PAGE_SiZE),
+    },
+  });
+
   useEffect(() => {
+    if (!data) {
+      return;
+    }
+    setLoading(true);
     const intervalId = setInterval(() => {
       refetch();
+      setBLocks(data.blocks);
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [refetch]);
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-  console.log('blocks', data.blocks);
+  }, [data, refetch]);
+  // if (loading) return <p>Loading...</p>;
+  // if (error) return <p>Error: {error.message}</p>;
+
+  const itemsPerPage = 20;
+  const totalPages = Math.ceil(data?.blocks.length / itemsPerPage);
+  console.log('length', data?.blocks.length);
+
+  // const start = (currentPage - 1) * itemsPerPage;
+  // const end = start + itemsPerPage;
+
+  // const currentData = data.blocks.slice(start, end);
+
+  const handlePageChange = (newPage: number) => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+    setCurrentPage(newPage);
+    console.log('currentPage', currentPage);
+    console.log('totalPage', totalPages);
+  };
 
   return (
     <div className="px-4 sm:px-20 lg:px-40 mt-4">
@@ -44,11 +82,16 @@ function Page() {
       </div>
       <Card>
         <CardBody>
-          <BlocksTable users={data.blocks} columns={columns} />
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+          <BlocksTable users={blocks} loading={loading} columns={columns} />
         </CardBody>
       </Card>
     </div>
   );
 }
 
-export default Page;
+export default Blocks;

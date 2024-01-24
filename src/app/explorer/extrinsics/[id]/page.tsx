@@ -2,13 +2,56 @@
 
 import * as React from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 import ExplorerHeader from '@/components/ExplorerHeader';
+import timeAgo from '@/lib/ConvertTime';
+import { gql, useQuery } from '@apollo/client';
 import { Card, CardBody } from '@nextui-org/react';
 import { Copy } from 'lucide-react';
 
-export default function page() {
+const GET_EXTRINSICS_BY_ID = gql`
+  query ExtrinsicById($id: String!) {
+    extrinsicById(id: $id) {
+      timestamp
+      extrinsicHash
+      blockNumber
+      fee
+      tip
+      version
+      success
+      signerPublicKey
+      indexInBlock
+      events {
+        eventName
+      }
+      calls {
+        callName
+      }
+      block {
+        height
+        id
+      }
+    }
+  }
+`;
+
+export default function ExtrinsicPage() {
+  const params = useParams();
+  const { loading, error, data } = useQuery(GET_EXTRINSICS_BY_ID, {
+    variables: { id: params.id },
+  });
+
+  if (loading) return <p>Loading...</p>;
+  if (error) {
+    console.error('GraphQL error:', error);
+    return <p>Error: {error.message}</p>;
+  }
+  const extrinsic = data.extrinsicById;
+  console.log('block-by-id', data.extrinsicById);
+
   return (
     <div className=" px-40">
       <div className="flex items-center justify-between my-6">
@@ -28,7 +71,7 @@ export default function page() {
                       Timestamp
                     </td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      2023-11-20 07:40:42 (+UTC)
+                      {extrinsic.timestamp}
                     </td>
                   </tr>
                   <tr className="bg-white border-b">
@@ -36,15 +79,15 @@ export default function page() {
                       Block Time
                     </td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      12 min ago
+                      {timeAgo(extrinsic.timestamp)}
                     </td>
                   </tr>
                   <tr className="bg-white border-b">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Block Number
                     </td>
-                    <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      94593003
+                    <td className=" flex items-center gap-2 text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
+                      {extrinsic.blockNumber}
                     </td>
                   </tr>
                   <tr className="bg-white border-b">
@@ -52,10 +95,18 @@ export default function page() {
                       Extrinsics Hash
                     </td>
                     <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a0f29
+                      {extrinsic.extrinsicHash}
                       <span>
-                        {/* <img src="/copy.png" className="w-4 h-4" /> */}
-                        <Copy size="16px" color="gray" />
+                        <Copy
+                          size="16px"
+                          color="gray"
+                          className="cursor-pointer"
+                          onClick={() =>
+                            navigator.clipboard.writeText(
+                              extrinsic.extrinsicHash,
+                            )
+                          }
+                        />
                       </span>
                     </td>
                   </tr>
@@ -63,10 +114,9 @@ export default function page() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Parent Hash
                     </td>
-                    <td className="text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
+                    <td className="text-sm font-light px-6 py-4 whitespace-nowrap">
                       <Link href="#">
-                        {' '}
-                        0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a
+                        {extrinsic.parentHash ? extrinsic.parentHash : '-'}
                       </Link>
                     </td>
                   </tr>
@@ -79,47 +129,29 @@ export default function page() {
                         href="#"
                         className="px-3 py-2 text-white bg-primary rounded-3xl"
                       >
-                        set
+                        {extrinsic.calls.map(
+                          (call: { callName: string }, index: number) => (
+                            <span key={index}>{call.callName}</span>
+                          ),
+                        )}
                       </Link>
                     </td>
                   </tr>
-                  <tr className="bg-white border-b">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      Asset Transfer
-                    </td>
-                    <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <span>
-                          From
-                          <span className="text-sel_blue ml-2">
-                            0xkiew534o4s
-                          </span>{' '}
-                        </span>
-                        <span className=" ml-4">
-                          To
-                          <span className="text-sel_blue ml-2">
-                            PromoT....idator
-                          </span>
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
+
                   <tr className="bg-white border-b">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Fee
                     </td>
-                    <td className="  text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
-                      <Link href="#" className="flex items-center gap-2">
-                        0.000023535 SEL
-                      </Link>
+                    <td className="  text-sm  font-light px-6 py-4 whitespace-nowrap">
+                      {extrinsic.fee ? extrinsic.fee : '-'}
                     </td>
                   </tr>
                   <tr className="bg-white border-b">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Tip
                     </td>
-                    <td className="text-sm text-sel_blue font-light px-6 py-4 whitespace-nowrap">
-                      <Link href="#">2525</Link>
+                    <td className="text-sm  font-light px-6 py-4 whitespace-nowrap">
+                      {extrinsic.tip ? extrinsic.tip : '-'}
                     </td>
                   </tr>
                   <tr className="bg-white border-b">
@@ -127,7 +159,9 @@ export default function page() {
                       Signer Public key
                     </td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      0xb28ed315d3272a379a36f4864538998619932ef94e04a37d0a5dd404014a
+                      {extrinsic.signerPublicKey
+                        ? extrinsic.signerPublicKey
+                        : '-'}
                     </td>
                   </tr>
                   <tr className="bg-white ">
@@ -135,7 +169,9 @@ export default function page() {
                       Event
                     </td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      71
+                      {extrinsic.events.eventName
+                        ? extrinsic.events.eventName
+                        : '-'}
                     </td>
                   </tr>
                   <tr className="bg-white ">
@@ -143,7 +179,7 @@ export default function page() {
                       Version
                     </td>
                     <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                      71
+                      {extrinsic.version}
                     </td>
                   </tr>
                   <tr className="bg-white ">
@@ -153,7 +189,13 @@ export default function page() {
                     <td className="text-sm text-gray-900 font-light py-4 whitespace-nowrap">
                       <td className=" flex items-center gap-2 text-sm text-gray-900 font-light px-6 whitespace-nowrap">
                         <span>
-                          <img src="/check.png" className="w-4 h-4" />
+                          <Image
+                            src="/check.png"
+                            alt="check"
+                            width={500}
+                            height={500}
+                            className="w-4 h-4"
+                          />
                         </span>
                         Success
                       </td>

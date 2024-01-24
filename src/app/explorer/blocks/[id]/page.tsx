@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
 import ExplorerHeader from '@/components/ExplorerHeader';
+import timeAgo from '@/lib/ConvertTime';
 import { gql, useQuery } from '@apollo/client';
 import { Card, CardBody } from '@nextui-org/react';
 import { Copy } from 'lucide-react';
@@ -81,7 +82,7 @@ const BlockPage: React.FC<BlockPageProps> = () => {
                     Block Time
                   </td>
                   <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-                    {convertTimeToSecond(data.blockById.timestamp)} seconds ago
+                    {timeAgo(data.blockById.timestamp)} 
                   </td>
                 </tr>
                 <tr className="bg-white border-b">
@@ -197,11 +198,3 @@ const BlockPage: React.FC<BlockPageProps> = () => {
 };
 
 export default BlockPage;
-
-function convertTimeToSecond(timestamp: string) {
-  const date: Date = new Date(timestamp);
-  const now: Date = new Date();
-  const timeDifference: number = now.getTime() - date.getTime();
-  const secondsAgo: number = Math.floor(timeDifference / 1000);
-  return secondsAgo;
-}

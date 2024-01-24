@@ -53,8 +53,8 @@ const explorer_nav_items = [
 function ExplorerHeader() {
   return (
     <>
-      <p>sg</p>
-      {/* <Navbar
+      {/* <p>sg</p> */}
+      <Navbar
         className="bg-transparent w-full px-0 mx-0 flex justify-end "
         isBlurred={false}
         classNames={{
@@ -76,7 +76,7 @@ function ExplorerHeader() {
                     <Button className="capitalize bg-transparent border-none text-medium text-gray-600">
                       {data.name}
                       <span>
-                        <ChevronDown size={14}/>
+                        <ChevronDown size={14} />
                       </span>
                     </Button>
                   </DropdownTrigger>
@@ -101,7 +101,7 @@ function ExplorerHeader() {
             </NavbarItem>
           ))}
         </NavbarContent>
-      </Navbar> */}
+      </Navbar>
     </>
   );
 }
